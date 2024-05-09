@@ -24,11 +24,11 @@ module.exports = (sequelize, DataTypes) => {
     userId:{
       type: DataTypes.INTEGER,
       allowNull: false,
-      values: [CONFIRMED, PENDING, CANCELLED, INITIATED],
       defaultValue: INITIATED
     },
     status: {
       type: DataTypes.ENUM,
+      values: [CONFIRMED, PENDING, CANCELLED, INITIATED],
       allowNull: false
     },
     passengers: {
