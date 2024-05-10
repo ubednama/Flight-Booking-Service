@@ -1,13 +1,11 @@
 const { StatusCodes } = require("http-status-codes");
 const { BookingService } = require("../services");
 const { SuccessResponse, ErrorResponse } = require("../utils/common");
-const { message } = require("../utils/common/error.response");
 
 const inMemDb = {}
 
 async function createBooking(req, res) {
     try {
-        console.log(req.body);
         const response = await BookingService.createBooking({
             flightId: req.body.flightId,
             userId: req.body.userId,
