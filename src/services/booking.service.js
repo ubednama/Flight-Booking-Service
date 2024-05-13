@@ -1,27 +1,20 @@
 const axios = require('axios')
+const { StatusCodes } = require('http-status-codes');
 
 const BookingRepository = require("../repositories/booking.repository")
 const db = require('../models');
-const { ServerConfig } = require('../config');
+const { ServerConfig, QueueConfig } = require('../config');
 const AppError = require('../utils/errors/app.error');
-const { StatusCodes } = require('http-status-codes');
+const {Enums} = require('../utils/common');
+const { CONFIRMED, CANCELLED } = Enums.STATUS;
 
 const bookingRepository = new BookingRepository();
 
 async function createBooking(data) {
-    // return new Promise((resolve, reject) => {
-    //    const result = db.sequelize.transaction(async function bookingImplementation(transaction) {
-    //         const flight = await axios.get(`${ServerConfig.FLIGHT_SERVICE}/api/v1/flights/${data.flightId}`);
-    //         if(data.passengers > flight.data.data.totalAvailableSeats) {
-    //             reject(new AppError("No of Seats exceeds total available Seats", StatusCodes.BAD_REQUEST))
-    //         }
-    //         resolve(true)
-    //    });
-    // })
 
     const transaction = await db.sequelize.transaction();
     try {
-        const flight = await axios.getAdapter(`${ServerConfig.FLIGHT_SERVICE}/api/v1/flights/${data.flightId}`)
+        const flight = await axios.get(`${ServerConfig.FLIGHT_SERVICE}/api/v1/flights/${data.flightId}`)
         const flightData = flight.data.data
         
         if(data.passengers > flightData.totalAvailableSeats) {
@@ -37,9 +30,11 @@ async function createBooking(data) {
         })
 
         await transaction.commit();
+        // console.log("from booking.service createBooking", booking)
         return booking;
     } catch (error) {
         await transaction.rollback();
+        // console.log("from booking.service createBooking error",error)
         throw error;        
     }
 }
@@ -69,9 +64,17 @@ async function makePayment(data) {
             throw new AppError("The user corresponding to the booking doesnt match", StatusCodes.BAD_REQUEST)
         }
 
-        await bookingRepository.update(data.bookingId, {status: BOOKED}, transaction);
+        await bookingRepository.update(data.bookingId, {status: CONFIRMED}, transaction);
         await transaction.commit()
+
+        QueueConfig.sendData({
+            recepientEmail: 'cejeye7278@losvtn.com',
+            subject: "Booking was Successful",
+            text: `Booking was successful for Flight ${data.bookingId}`
+        })
+
     } catch(error) {
+        console.log("error in booking.service makePayment",error)
         await transaction.rollback();
         throw error;
     }

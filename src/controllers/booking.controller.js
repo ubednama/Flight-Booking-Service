@@ -11,11 +11,13 @@ async function createBooking(req, res) {
             userId: req.body.userId,
             passengers: req.body.passengers
         });
+        // console.log("res",response)
         SuccessResponse.data = response;
         return res
             .status(StatusCodes.OK)
             .json(SuccessResponse);
     } catch (error) {
+        // console.log("from Booking.controller createBooking",error)
         ErrorResponse.error = error;
         return res
             .status(error.statusCode)
@@ -44,13 +46,14 @@ async function makePayment(req, res) {
         inMemDb[idempotencyKey] = idempotencyKey
         SuccessResponse.data = response;
         return res
-            .status(StatusCodes.OK)
-            .json(SuccessResponse);
-    } catch (error) {
+                .status(StatusCodes.OK)
+                .json(SuccessResponse);
+    } catch(error) {
+        console.log(error);
         ErrorResponse.error = error;
         return res
-            .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .json(ErrorResponse);
+                .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                .json(ErrorResponse);
     }
 }
 

@@ -7,3 +7,5 @@ function scheduleCrons() {
         await BookingService.cancelOldBookings()
     })
 }
+
+module.exports = scheduleCrons
