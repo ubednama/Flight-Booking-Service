@@ -6,6 +6,7 @@ const Sequelize = require('sequelize');
 const process = require('process');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
+const createDatabaseIfNotExists = require('../utils/scripts/db.create');
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
@@ -15,6 +16,8 @@ if (config.use_env_variable) {
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
+
+createDatabaseIfNotExists(sequelize)
 
 fs
   .readdirSync(__dirname)
