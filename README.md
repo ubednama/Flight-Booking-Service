@@ -7,3 +7,6 @@ This microservice is responsible for handling flight ticket bookings within the 
 - Express.js
 - Sequelize (for SQL queries)
 - Axios (for HTTP requests)
+
+## Installation
+Setup .env file and run the project with other microservices
